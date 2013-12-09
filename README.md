@@ -4,6 +4,8 @@ Visualization tool for discrete Boltzmann distributions.
 
 ## Installation
 
+`python setup.py install`
+
 Requires:
 
 * [`argparse`](https://pypi.python.org/pypi/argparse/)
@@ -18,12 +20,14 @@ Run it using the provided `bin/boltzmannizer` script.
 
 ## Testing
 
+`python setup.py test`
+
 Requires:
 
 * [`nose`](https://nose.readthedocs.org/en/latest/)
 * [`unittest2`](https://pypi.python.org/pypi/unittest2)
 
-Run all the tests with `nosetests` from the root directory.
+For a more manual approach, install the test dependencies and run all the tests with `nosetests` from the root directory.
 
 `unittest2` is used to get new `unittest` features on old versions of Python.
 
