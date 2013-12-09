@@ -1,7 +1,7 @@
 from nose.tools import eq_
 from unittest2 import main, TestCase
 
-from boltzmannizer.tools.misc import memoized
+from boltzmannizer.tools.misc import memoized, Reserver
 
 
 class MemoizedTest(TestCase):
@@ -51,6 +51,80 @@ class MemoizedTest(TestCase):
 
 		eq_(records, records_expected)
 		eq_(results, results_expected)
+
+
+class ReserverTest(TestCase):
+	def testEmpty(self):
+		"""
+		A useless Reserver with nothing to reserve.
+		"""
+
+		OVERFLOW = 'o'
+
+		r = Reserver([], OVERFLOW)
+
+		for _ in xrange(10):
+			eq_(r.allocate(), OVERFLOW)
+
+		for _ in xrange(10):
+			r.free(OVERFLOW)
+
+		with self.assertRaises(ValueError):
+			r.free(OVERFLOW + OVERFLOW)
+
+	def testSeveral(self):
+		"""
+		A less useless Reserver.
+		"""
+
+		OVERFLOW = 'o'
+
+		r = Reserver(['z', 'y', 'x'], OVERFLOW)
+
+		results = []
+
+		# Make some allocations and frees in an arbitrary order and check that
+		# priority is given to the earlier items.
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+		r.free('z')
+		r.free('y')
+		r.free('x')
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+		r.free('x')
+		r.free('z')
+		r.free('y')
+		results.append(r.allocate())
+		results.append(r.allocate())
+		r.free('y')
+		results.append(r.allocate())
+		r.free('z')
+		r.free('x')
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+		r.free('x')
+		r.free('z')
+		results.append(r.allocate())
+		results.append(r.allocate())
+		results.append(r.allocate())
+
+		expected = [
+				'z', 'y', 'x', 'o',
+				'z', 'y', 'x', 'o', 'o',
+				'z', 'y',
+				'y',
+				'z', 'x', 'o',
+				'z', 'x', 'o',
+				]
+
+		eq_(results, expected)
 
 
 if __name__ == '__main__':
