@@ -10,6 +10,7 @@ Requires:
 
 * [`argparse`](https://pypi.python.org/pypi/argparse/)
 * [`matplotlib`](http://matplotlib.org/)
+* [`numpy`](http://www.numpy.org/)
 * [`wxPython`](http://wxpython.org/)
 
 Note that `wxPython` can't be installed through `pip`, so you will need to install it manually first.

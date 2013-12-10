@@ -2,6 +2,8 @@ from nose.tools import assert_almost_equal, eq_
 from os.path import join
 from unittest2 import main, TestCase
 
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+
 from boltzmannizer.science.boltzmann_distribution import BoltzmannDistribution, NonIncreasingEnergies
 
 
@@ -18,8 +20,8 @@ class BoltzmannDistributionTest(TestCase):
 
 		eq_(list(bd.levels), [])
 		eq_(bd.k_B, 1)
-		eq_(bd.energies, [])
-		eq_(bd.degeneracies, [])
+		assert_array_equal(bd.energies, [])
+		assert_array_equal(bd.degeneracies, [])
 		eq_(bd.num_levels, (0, 0))
 
 		eq_(bd.Z(123), 0)
@@ -47,24 +49,18 @@ class BoltzmannDistributionTest(TestCase):
 
 		eq_(list(bd.levels), range(3))
 		eq_(bd.k_B, 0.5)
-		eq_(bd.energies, [1, 2, 3])
-		eq_(bd.degeneracies, [3, 2, 1])
+		assert_array_equal(bd.energies, [1, 2, 3])
+		assert_array_equal(bd.degeneracies, [3, 2, 1])
 		eq_(bd.num_levels, (3, 6))
 
-		assert_almost_equal(bd.b_factor(0, 2), 1.103638323514327)
-		assert_almost_equal(bd.b_factor(1, 2), 0.270670566473225)
-		assert_almost_equal(bd.b_factor(2, 2), 0.049787068367864)
+		assert_array_almost_equal(bd.b_factors(2), [1.103638323514327, 0.270670566473225, 0.049787068367864])
 		assert_almost_equal(bd.Z(2), 1.424095958355416)
 
 		# Check the ground state.
-		eq_(bd.p(0, 0), 1)
-		eq_(bd.p(1, 0), 0)
-		eq_(bd.p(2, 0), 0)
+		assert_array_equal(bd.ps(0), [1, 0, 0])
 
 		# Check finite temperature.
-		assert_almost_equal(bd.p(0, 2), 0.774974689759556)
-		assert_almost_equal(bd.p(1, 2), 0.190064837193838)
-		assert_almost_equal(bd.p(2, 2), 0.034960473046605)
+		assert_array_almost_equal(bd.ps(2), [0.774974689759556, 0.190064837193838, 0.034960473046605])
 
 		assert_almost_equal(bd.energy(2), 1.259985783287049)
 		assert_almost_equal(bd.entropy(2), 0.315191678445456)

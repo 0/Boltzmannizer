@@ -11,7 +11,7 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as Canvas
 # Allows us to use the 3D projection.
 from mpl_toolkits.mplot3d import Axes3D
 
-from numpy import linspace
+import numpy as N
 
 import wx
 from wx.lib.intctrl import IntCtrl
@@ -95,7 +95,7 @@ class PlotPanel2DByTemperature(wx.Panel):
 		self.plot_cached_data()
 
 	def _gen_temps(self):
-		return linspace(self.min_temp, self.max_temp, self.NUM_TEMPS)
+		return N.linspace(self.min_temp, self.max_temp, self.NUM_TEMPS)
 
 
 class PlotFrame2DByTemperature(wx.Frame):
@@ -200,11 +200,13 @@ class PlotPanel3DPopulation(wx.Panel):
 		ys = bd.energies
 		verts = []
 
-		for i in bd.levels:
-			populations = [bd.p(i, x) for x in xs]
+		# All the energy level populations at all the temperatures.
+		populations = N.column_stack(bd.ps(x) for x in xs)
+
+		for p in populations:
 			# Add the points on the ends so that there is a bottom edge along
 			# the polygon.
-			points = [(xs[0], 0)] + list(zip(xs, populations)) + [(xs[-1], 0)]
+			points = [(xs[0], 0)] + list(zip(xs, p)) + [(xs[-1], 0)]
 			verts.append(points)
 
 		x_min, x_max = min(xs), max(xs)
@@ -254,7 +256,7 @@ class PlotPanel3DPopulation(wx.Panel):
 		cid = self.canvas.mpl_connect('button_release_event', on_release)
 
 	def _gen_temps(self):
-		return linspace(0, 2000, 200)
+		return N.linspace(0, 2000, 200)
 
 
 class PlotFrame3DPopulation(wx.Frame):

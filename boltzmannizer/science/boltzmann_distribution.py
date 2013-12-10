@@ -4,6 +4,8 @@ from json import load
 from math import exp, log
 from os.path import basename, splitext
 
+import numpy as N
+
 from boltzmannizer.tools.misc import memoized
 
 
@@ -34,8 +36,8 @@ class BoltzmannDistribution(object):
 		# The results are cached, so these values should not be modified.
 		# Read-only properties are provided.
 		self._k_B = k_B
-		self._energies = energies
-		self._degeneracies = degeneracies
+		self._energies = N.array(energies)
+		self._degeneracies = N.array(degeneracies)
 
 		if self._k_B <= 0:
 			raise ValueError('k_B must be positive')
@@ -151,14 +153,14 @@ class BoltzmannDistribution(object):
 		return 1 / (self.k_B * T)
 
 	@memoized
-	def b_factor(self, i, T):
+	def b_factors(self, T):
 		"""
-		Boltzmann factor of the ith level at temperature T.
+		Boltzmann factors of all the levels at temperature T.
 
 		$g_i e^{-\\beta E_i}$
 		"""
 
-		return self.degeneracies[i] * exp(-self.beta(T) * self.energies[i])
+		return self.degeneracies * N.exp(-self.beta(T) * self.energies)
 
 	@memoized
 	def Z(self, T):
@@ -168,12 +170,12 @@ class BoltzmannDistribution(object):
 		$Z = \\sum_{i=1}^n g_i e^{-\\beta E_i}$
 		"""
 
-		return sum(self.b_factor(i, T) for i in self.levels)
+		return self.b_factors(T).sum()
 
 	@memoized
-	def p(self, i, T):
+	def ps(self, T):
 		"""
-		Probability of occupying the ith level at temperature T.
+		Probabilities of occupying the levels at temperature T.
 
 		$p_i = \\frac{1}{Z} g_i e^{-\\beta E_i}$
 		"""
@@ -181,7 +183,7 @@ class BoltzmannDistribution(object):
 		if T == 0:
 			# Treat the zero-temperature case explicitly, assuming that
 			# everything is in the ground state.
-			return 1.0 if i == 0 else 0.0
+			return self._ground_state_ps
 		else:
 			Z = self.Z(T)
 
@@ -189,17 +191,9 @@ class BoltzmannDistribution(object):
 				# If Z is zero, also assume that we're in the ground state,
 				# because we're probably here due to rounding error at very low
 				# temperature.
-				return 1.0 if i == 0 else 0.0
+				return self._ground_state_ps
 
-			return self.b_factor(i, T) / Z
-
-	@memoized
-	def ps(self, T):
-		"""
-		Probabilities of being in each of the levels at temperature T.
-		"""
-
-		return [self.p(i, T) for i in self.levels]
+			return self.b_factors(T) / Z
 
 	@memoized
 	def energy(self, T):
@@ -209,7 +203,7 @@ class BoltzmannDistribution(object):
 		$U = \\langle E \\rangle = \\frac{1}{Z} \\sum_{i=1}^n E_i g_i e^{-\\beta E_i}$
 		"""
 
-		return sum(self.energies[i] * p for i, p in enumerate(self.ps(T)))
+		return (self.energies * self.ps(T)).sum()
 
 	@memoized
 	def entropy(self, T):
@@ -221,8 +215,11 @@ class BoltzmannDistribution(object):
 		Has the same units as k_B.
 		"""
 
-		# By convention, 0 log 0 = 0.
-		return -self.k_B * sum(p * log(p) for p in self.ps(T) if p > 0)
+		ps_all = self.ps(T)
+		# By convention, 0 log 0 = 0, so we can drop those.
+		ps = ps_all[ps_all.nonzero()]
+
+		return -self.k_B * (ps * N.log(ps)).sum()
 
 	@memoized
 	def heat_capacity(self, T):
@@ -238,6 +235,13 @@ class BoltzmannDistribution(object):
 
 		return self.beta(T) * (self._energy_sq(T) - self.energy(T) * self.energy(T)) / T
 
+	@property
+	def _ground_state_ps(self):
+		result = N.zeros(self.num_levels[0])
+		result[0] = 1.0
+
+		return result
+
 	@memoized
 	def _energy_sq(self, T):
 		"""
@@ -249,4 +253,4 @@ class BoltzmannDistribution(object):
 		be the square of the expectation value of the energy instead.
 		"""
 
-		return sum(self.energies[i] * self.energies[i] * p for i, p in enumerate(self.ps(T)))
+		return (self.energies ** 2 * self.ps(T)).sum()
