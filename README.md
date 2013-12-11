@@ -4,7 +4,9 @@ Visualization tool for discrete Boltzmann distributions.
 
 ## Installation
 
-`python setup.py install`
+The easy way: `pip install Boltzmannizer`
+
+The less-easy way: `python setup.py install`
 
 Requires:
 
@@ -14,6 +16,10 @@ Requires:
 * [`wxPython`](http://wxpython.org/)
 
 Note that `wxPython` can't be installed through `pip`, so you will need to install it manually first.
+
+This package should be compatible with both Python 2.6 and 2.7, and has been tested on Linux and Mac OS X.
+
+It is highly recommended that this package is installed and run inside a [virtualenv](http://www.virtualenv.org/). The `wxPython` dependency makes this non-trivial, but it is still possible. The use of [wheels](http://wheel.readthedocs.org) is also encouraged, as they make the virtualenv experience _much_ better.
 
 ## Running
 
