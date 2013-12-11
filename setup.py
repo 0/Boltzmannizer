@@ -33,7 +33,7 @@ setup(
 	],
 	install_requires=install_requires,
 	tests_require=tests_require,
-	packages=find_packages(),
+	packages=find_packages(exclude=['tests', 'tests.*']),
 	scripts=[
 		'bin/boltzmannizer',
 	],
