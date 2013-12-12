@@ -212,7 +212,10 @@ class PlotPanel3DPopulation(wx.Panel):
 		x_min, x_max = min(xs), max(xs)
 		y_min, y_max = min(ys), max(ys)
 
-		colors = [cm((ys[i] - y_min) / (y_max - y_min)) for i in bd.levels]
+		if y_max == y_min:
+			colors = [cm(0.0) for i in bd.levels]
+		else:
+			colors = [cm((ys[i] - y_min) / (y_max - y_min)) for i in bd.levels]
 
 		poly = PolyCollection(verts, facecolors=colors, linewidth=1.0, edgecolor='white')
 		poly.set_alpha(0.7)
@@ -221,8 +224,16 @@ class PlotPanel3DPopulation(wx.Panel):
 		# the way the polygons are stacked.
 		self.axes.add_collection3d(poly, zs=ys, zdir='y')
 
-		self.axes.set_xlim3d(x_min, x_max)
-		self.axes.set_ylim3d(y_min, y_max)
+		if x_max == x_min:
+			self.axes.set_xlim3d(x_min - 1, x_max + 1)
+		else:
+			self.axes.set_xlim3d(x_min, x_max)
+
+		if y_max == y_min:
+			self.axes.set_ylim3d(y_min - 1, y_max + 1)
+		else:
+			self.axes.set_ylim3d(y_min, y_max)
+
 		self.axes.set_zlim3d(0, 1)
 
 		if xlabel is not None:
