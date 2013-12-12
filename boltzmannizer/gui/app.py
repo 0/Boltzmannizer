@@ -30,7 +30,7 @@ class BoltzmannDistributionGUI(BoltzmannDistribution):
 
 
 class MainFrame(wx.Frame):
-	COLORS = ['blue', 'green', 'red', 'magenta', 'black', 'cyan', 'brown']
+	COLORS = ['blue', 'green', 'red', 'magenta', 'black', 'cyan', 'brown', 'orange', 'grey']
 	# Yellow is awful, but we've run out of colors at this point!
 	OVERFLOW_COLOR = 'yellow'
 
