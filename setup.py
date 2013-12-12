@@ -36,6 +36,7 @@ setup(
 	packages=find_packages(exclude=['tests', 'tests.*']),
 	scripts=[
 		'bin/boltzmannizer',
+		'bin/col2json.py',
 	],
 	test_suite='nose.collector',
 )
