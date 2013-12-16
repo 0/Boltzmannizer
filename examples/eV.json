@@ -1,0 +1,10 @@
+{ "format_version": 1
+, "k_B": 8.6173e-5
+, "units": { "energy": "eV"
+           , "temperature": "K"
+           }
+, "levels": [ [0, 5]
+            , [1234e-5, 3]
+            , [2341e-5]
+            ]
+}
