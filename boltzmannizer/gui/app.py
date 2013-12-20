@@ -34,7 +34,7 @@ class MainFrame(wx.Frame):
 	# Yellow is awful, but we've run out of colors at this point!
 	OVERFLOW_COLOR = 'yellow'
 
-	def __init__(self):
+	def __init__(self, paths=None):
 		wx.Frame.__init__(self, None, title='Boltzmannizer', size=(600, 400))
 
 		self.plot_functions = {
@@ -139,6 +139,10 @@ class MainFrame(wx.Frame):
 
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 
+		# Load any files that were already requested.
+		if paths is not None:
+			self._load_multiple_data(paths)
+
 	def OnMenuFileOpen(self, evt):
 		wildcard = 'JSON (*.json)|*.json|All files|*'
 		dialog = wx.FileDialog(self, 'Add data', wildcard=wildcard, style=wx.FD_OPEN|wx.FD_FILE_MUST_EXIST|wx.MULTIPLE)
@@ -146,8 +150,7 @@ class MainFrame(wx.Frame):
 		if dialog.ShowModal() != wx.ID_OK:
 			return
 
-		for path in dialog.GetPaths():
-			self._load_data(path)
+		self._load_multiple_data(dialog.GetPaths())
 
 	def OnMenuEditSelectAll(self, evt):
 		self.dp.select_all()
@@ -353,6 +356,10 @@ class MainFrame(wx.Frame):
 
 		index, key = self.dp.AddRow([bd.filename, levels, states, ' '.join(k_B)], bd)
 
+	def _load_multiple_data(self, paths):
+		for path in paths:
+			self._load_data(path)
+
 	def _redraw_plots(self):
 		for name, frame in self.plot_frames_2D.items():
 			self._redraw_plot(name, frame)
@@ -392,8 +399,16 @@ class MainFrame(wx.Frame):
 
 
 class BoltzmannizerApp(wx.App):
+	def __init__(self, paths=None, *args, **kwargs):
+		if paths is not None:
+			self.paths = paths
+		else:
+			self.paths = []
+
+		wx.App.__init__(self, *args, **kwargs)
+
 	def OnInit(self):
-		frame = MainFrame()
+		frame = MainFrame(paths=self.paths)
 		frame.Show()
 
 		return True
@@ -406,11 +421,14 @@ if __name__ == '__main__':
 	parser = ArgumentParser(description='The Boltzmannizer.')
 	parser.add_argument('--debug', dest='debug', action='store_true',
 			help="don't redirect output to a special GUI window")
+	parser.add_argument('filenames', metavar='file', type=str, nargs='*',
+			help='data file to load')
 
 	args = parser.parse_args()
 
 	redirect = 0 if args.debug else 1
+	filenames = args.filenames
 
 	# Run the application.
-	app = BoltzmannizerApp(redirect=redirect)
+	app = BoltzmannizerApp(paths=filenames, redirect=redirect)
 	app.MainLoop()
