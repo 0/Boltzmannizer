@@ -169,8 +169,8 @@ class MainFrame(wx.Frame):
 		for i in self.dp.selected:
 			bd = self.dp.objects[i]
 
-			xlabel = 'T'
-			ylabel = 'E'
+			xlabel = r'$T$'
+			ylabel = r'$E$'
 
 			if bd.units is not None:
 				xlabel += ' / ' + bd.units['temperature']
@@ -179,7 +179,7 @@ class MainFrame(wx.Frame):
 				ylabel += ' / ' + bd.units['energy']
 
 			plot_frame = PlotFrame3DPopulation('Populations: {0}'.format(bd.filename))
-			plot_frame.plot_data(bd, xlabel=xlabel, ylabel=ylabel, zlabel='P')
+			plot_frame.plot_data(bd, xlabel=xlabel, ylabel=ylabel, zlabel=r'$P$')
 			plot_frame.Show()
 
 			def remove_frame():
@@ -225,14 +225,14 @@ class MainFrame(wx.Frame):
 		units_temperature = self._combine_units(units_temperature)
 
 		if units_temperature:
-			xlabel = 'T / {0}'.format(units_temperature)
+			xlabel = r'$T$ / {0}'.format(units_temperature)
 		else:
-			xlabel = 'T'
+			xlabel = r'$T$'
 
 		if units_energy:
-			ylabel = 'E / {0}'.format(units_energy)
+			ylabel = r'$U$ / {0}'.format(units_energy)
 		else:
-			ylabel = 'E'
+			ylabel = r'$U$'
 
 		callback(fs, bds, xlabel=xlabel, ylabel=ylabel)
 
@@ -260,14 +260,14 @@ class MainFrame(wx.Frame):
 		units_temperature = self._combine_units(units_temperature)
 
 		if units_temperature:
-			xlabel = 'T / {0}'.format(units_temperature)
+			xlabel = r'$T$ / {0}'.format(units_temperature)
 		else:
-			xlabel = 'T'
+			xlabel = r'$T$'
 
 		if units_energy and units_temperature:
-			ylabel = 'S / ({0} / {1})'.format(units_energy, units_temperature)
+			ylabel = r'$S$ / ({0} / {1})'.format(units_energy, units_temperature)
 		else:
-			ylabel = 'S'
+			ylabel = r'$S$'
 
 		callback(fs, bds, xlabel=xlabel, ylabel=ylabel)
 
@@ -295,14 +295,14 @@ class MainFrame(wx.Frame):
 		units_temperature = self._combine_units(units_temperature)
 
 		if units_temperature:
-			xlabel = 'T / {0}'.format(units_temperature)
+			xlabel = r'$T$ / {0}'.format(units_temperature)
 		else:
-			xlabel = 'T'
+			xlabel = r'$T$'
 
 		if units_energy and units_temperature:
-			ylabel = 'Cv / ({0} / {1})'.format(units_energy, units_temperature)
+			ylabel = r'$C_V$ / ({0} / {1})'.format(units_energy, units_temperature)
 		else:
-			ylabel = 'Cv'
+			ylabel = r'$C_V$'
 
 		callback(fs, bds, xlabel=xlabel, ylabel=ylabel)
 
